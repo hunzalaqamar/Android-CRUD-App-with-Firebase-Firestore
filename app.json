@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "firebasecrud",
+    "slug": "firebasecrud",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "firebasecrud"
+}
