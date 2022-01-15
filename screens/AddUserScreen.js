@@ -6,9 +6,10 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
+  Alert
 } from "react-native";
 
-import { getDoc, setDoc, doc, deleteDoc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import { firestore } from "../database/FirebaseDB";
 
 function AddUserScreen({ navigation }) {
@@ -17,45 +18,13 @@ function AddUserScreen({ navigation }) {
   const [mobile, setMobile] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  //adding & updating done
-  // setDoc(doc(firestore, "users", "AA2"), {
-  //   name: "65",
-  //   email: "65@",
-  //   mobile: "nk"
-  // });
-
-  //reading data
-  // const docRef = doc(firestore, "users", "AA2");
-  // async function docSnap(){
-  //   return await getDoc(docRef);
-  // }
-
-  // docSnap().then(data =>{
-  //   if (data.exists()) {
-  //     console.log("Document data:", data.data());
-  //   } else {
-  //     // doc.data() will be undefined in this case
-  //     console.log("No such document!");
-  //   };
-  // })
-
-  //deleting data
-
-  // async function delDoc(){
-  //   await deleteDoc(doc(firestore, "users", "gG7LXl1QhoXIOwBYiT7e"));
-  // }
-
-  // delDoc().then(res=>{
-  //   console.log("Done For!!!!")
-  // })
-
   const storeUser = () => {
     if (name === "") {
       alert("Fill at least your name!");
     } else {
       setIsLoading(true);
       async function setUser() {
-        await setDoc(doc(firestore, "users", "AA3"), {
+        await setDoc(doc(firestore, "users", name), {
           name: name,
           email: email,
           mobile: mobile,
@@ -63,11 +32,18 @@ function AddUserScreen({ navigation }) {
       }
       setUser()
         .then((res) => {
+          Alert.alert(
+            "Sucess",
+            "User Record Added Successfully, Navigating to User List",
+            [
+              { text: "OK", onPress:()=>navigation.navigate("UserScreen"), style: "cancel"}
+            ]
+          );
           setName("");
           setEmail("");
           setMobile("");
           setIsLoading(false);
-          navigation.navigate("UserScreen");
+          
         })
         .catch((err) => {
           console.error("Error found: ", err);
@@ -112,6 +88,9 @@ function AddUserScreen({ navigation }) {
       <View style={styles.button}>
         <Button title="Add User" onPress={() => storeUser()} color="#19AC52" />
       </View>
+      <View style={styles.button}>
+        <Button title="View Users" onPress={()=> navigation.navigate("UserScreen")} color="#19AC52" />
+      </View>
     </ScrollView>
   );
 }
@@ -122,8 +101,6 @@ const styles = StyleSheet.create({
     padding: 35,
   },
   inputGroup: {
-    flex: 1,
-    padding: 0,
     marginBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#cccccc",
@@ -137,6 +114,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  button:{
+    marginTop: 10, 
+  }
 });
 
 export default AddUserScreen;
