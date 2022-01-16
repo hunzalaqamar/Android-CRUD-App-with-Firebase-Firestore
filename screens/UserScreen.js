@@ -5,14 +5,17 @@ import { ListItem } from "react-native-elements";
 import { firestore } from "../database/FirebaseDB";
 import { collection, deleteDoc, getDocs, doc } from "firebase/firestore";
 import { Button } from "react-native-elements/dist/buttons/Button";
+import { useIsFocused } from "@react-navigation/native";
 
 function UserScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(true);
   const [userArray, setUserArray] = useState([]);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     querySnapshot();
-  }, []);
+  }, [isFocused]);
 
   async function querySnapshot() {
     const tempArr = [];
@@ -28,18 +31,18 @@ function UserScreen({ navigation }) {
             email,
           });
         });
-        setIsLoading(false);
         setUserArray(tempArr);
+        setIsLoading(false)
       })
       .catch((err) => {
         console.log(err);
       });
   }
 
-  const deleteUser = (name) => {
+  const deleteUser = (id) => {
     setIsLoading(true);
     async function deleteUser() {
-      await deleteDoc(doc(firestore, "users", name));
+      await deleteDoc(doc(firestore, "users", id));
     }
     deleteUser()
       .then(() => {
@@ -54,17 +57,23 @@ function UserScreen({ navigation }) {
         navigation.navigate("UserScreen");
       })
       .catch((err) => {
-        console.error("Error found: ", err);
+        Alert.alert(
+          "Failed",
+          "User Record Not Deleted",
+          [
+            { text: "OK", style: "cancel"}
+          ]
+        );
         setIsLoading(false);
       });
   };
 
-  const openTwoButtonAlert = (name) => {
+  const openTwoButtonAlert = (id) => {
     Alert.alert(
       'Delete User',
       'Are you sure?',
       [
-        {text: 'Yes', onPress: () => deleteUser(name)},
+        {text: 'Yes', onPress: () => deleteUser(id)},
         {text: 'No', style: 'cancel'},
       ],
       { 
@@ -94,7 +103,7 @@ function UserScreen({ navigation }) {
                 title="Edit"
                 onPress={() => {
                   navigation.navigate("UserDetailScreen", {
-                    username: item.id,
+                    userId: item.id,
                   });
                 }}
                 icon={{ name: "info", color: "white" }}
@@ -114,13 +123,15 @@ function UserScreen({ navigation }) {
             key={i}
           >
             <ListItem.Content>
-              <ListItem.Title>{item.id}</ListItem.Title>
-              <ListItem.Subtitle>{item.name}</ListItem.Subtitle>
+              <ListItem.Title>{item.name}</ListItem.Title>
+              <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
+              <ListItem.Subtitle>{item.mobile}</ListItem.Subtitle>
             </ListItem.Content>
             <ListItem.Chevron />
           </ListItem.Swipeable>
         );
-      })}
+      })
+      }
     </ScrollView>
   );
 }

@@ -6,12 +6,14 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
+  Alert
 } from "react-native";
 
 import { getDoc, setDoc, doc} from "firebase/firestore";
 import { firestore } from "../database/FirebaseDB";
 
 function UserDetailScreen({ route, navigation }) {
+  const {userId} = route.params
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
@@ -23,9 +25,7 @@ function UserDetailScreen({ route, navigation }) {
 
   async function querySnapshot() {
     setIsLoading(true);
-    const {username} = route.params
-    console.log(username)
-    await getDoc(doc(firestore, "users", username))
+    await getDoc(doc(firestore, "users", userId))
       .then((qs) => {
         if (qs.exists) {
           const { name, mobile, email } = qs.data();
@@ -46,7 +46,7 @@ function UserDetailScreen({ route, navigation }) {
     } else {
       setIsLoading(true);
       async function updateUser() {
-        await setDoc(doc(firestore, "users", name), {
+        await setDoc(doc(firestore, "users", userId), {
           name: name,
           email: email,
           mobile: mobile,
@@ -67,7 +67,13 @@ function UserDetailScreen({ route, navigation }) {
           );
         })
         .catch((err) => {
-          console.error("Error found: ", err);
+          Alert.alert(
+            "Failed",
+            "User Record Not Updated, Navigating to User List",
+            [
+              { text: "OK", onPress:()=>navigation.navigate("UserScreen"), style: "cancel"}
+            ]
+          );
           setIsLoading(false);
         });
     }

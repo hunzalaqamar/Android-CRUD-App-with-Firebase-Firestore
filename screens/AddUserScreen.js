@@ -12,6 +12,9 @@ import {
 import { setDoc, doc } from "firebase/firestore";
 import { firestore } from "../database/FirebaseDB";
 
+import nextId from "react-id-generator";
+
+
 function AddUserScreen({ navigation }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -24,7 +27,7 @@ function AddUserScreen({ navigation }) {
     } else {
       setIsLoading(true);
       async function setUser() {
-        await setDoc(doc(firestore, "users", name), {
+        await setDoc(doc(firestore, "users", String(nextId())), {
           name: name,
           email: email,
           mobile: mobile,
